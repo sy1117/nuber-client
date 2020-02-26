@@ -1,7 +1,8 @@
 import { DefaultTheme } from 'styled-components'
 
 interface IThemeInterface { 
-  blueColor:string
+    blueColor:string
+    greyColor: string
 }
 
 
