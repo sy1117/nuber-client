@@ -28,7 +28,7 @@ interface IProps {
     required?:boolean
     value?:string
     name?:string
-    onChange?:React.ChangeEventHandler
+    onChange?:React.ChangeEventHandler |undefined
 }
 
 const Input : React.StatelessComponent<IProps> = ({ placeholder="", type="", required=true , value="", name="", onChange}) => 

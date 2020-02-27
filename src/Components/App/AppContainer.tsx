@@ -6,13 +6,17 @@ import reset from 'styled-reset'
 import { ThemeProvider } from 'styled-components'
 import theme from '../../theme'
 import GlobalStyle from '../../global-styles'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 
 const AppContainer = ({data}:any)=>
-
-<ThemeProvider theme={theme}>
-    <GlobalStyle/>
-    <AppPresenter isLoggedIn={data.auth.isLoggedIn}/>
-</ThemeProvider>
+<React.Fragment>
+    <ThemeProvider theme={theme}>
+        <GlobalStyle/>
+        <AppPresenter isLoggedIn={data.auth.isLoggedIn}/>
+        <ToastContainer draggable={true} position={"bottom-center"} />
+    </ThemeProvider>
+</React.Fragment>
 
 export default graphql(IS_LOGGED_IN)(AppContainer)
