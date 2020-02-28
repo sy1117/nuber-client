@@ -20,11 +20,11 @@ interface IProps {
   onSubmit : React.FormEventHandler,
   loading:boolean,
   onChange:React.ChangeEventHandler,
-  key:string,
+  verificationKey:string,
 }
 
 
-const VerifyPhonePresenter : React.SFC<IProps> = ({key, onSubmit,onChange,loading}) => (
+const VerifyPhonePresenter : React.SFC<IProps> = ({verificationKey, onSubmit,onChange,loading}) => (
   <Container>
     <Helmet>
       <title>Verify Phone | Number</title>
@@ -32,14 +32,15 @@ const VerifyPhonePresenter : React.SFC<IProps> = ({key, onSubmit,onChange,loadin
     <Header backTo={"/phone-login"} title={"Verify Phone Number"} />
     <ExtendedForm onSubmit={onSubmit} className={""}>
       <ExtendedInput
-			value={key}
-			placeholder={"Enter Verification Code"}
-			onChange={onChange}
-		/>
-		<Button 
-			onClick={null} 
-			value={loading?"Verifying": "Submit"}
-			disabled={loading}/>
+        value={verificationKey}
+        name={"key"}
+        placeholder={"Enter Verification Code"}
+        onChange={onChange}
+      />
+      <Button 
+        onClick={onSubmit} 
+        value={loading?"Verifying": "Submit"}
+        disabled={loading}/>
     </ExtendedForm>
   </Container>
 );

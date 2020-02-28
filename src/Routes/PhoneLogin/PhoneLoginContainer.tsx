@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PhoneLoginPresenter from "./PhoneLoginPresenter";
-import { RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps, useHistory, withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PHONE_SIGN_IN } from "./PhoneQueries.queries";
 import { useMutation } from "@apollo/react-hooks";
@@ -8,7 +8,7 @@ import { MutationFunctionOptions } from "react-apollo";
 import { startPhoneVerification } from "../../types/api";
 import { GraphQLError } from "graphql";
 
-interface IProps extends RouteComponentProps<any>{
+interface IProps {
 
 }
 
@@ -26,9 +26,10 @@ interface IState {
     phoneNumber: string
 }
 
-const PhoneLoginContainer : React.FunctionComponent<IProps>= ({history})=>{
+const PhoneLoginContainer : React.FunctionComponent<IProps>= ()=>{
 
     const [phoneSignIn,{loading, data}] = useMutation<IMutation>(PHONE_SIGN_IN)
+    let history = useHistory();
 
     const [state, setState] = useState<IState>({
         countryCode : "+82",
@@ -55,11 +56,9 @@ const PhoneLoginContainer : React.FunctionComponent<IProps>= ({history})=>{
         if(StartPhoneVerification.ok){
             toast.success("SMS Sent! Redirecting you...")
             setTimeout(()=>{
-                history.push({
-                    pathname:"/verify-phone",
-                    state:{
-                        phoneNumber
-                    }
+                history.push("/verify-phone",
+                {
+                    phoneNumber:phone
                 })
             }, 1000)
             return;

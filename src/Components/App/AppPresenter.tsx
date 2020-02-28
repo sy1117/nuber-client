@@ -20,7 +20,7 @@ interface IProps{
 }
 
 const AppPresenter : React.SFC<IProps>= ({isLoggedIn})=>
-    <BrowserRouter>
+    <BrowserRouter forceRefresh={true}>
         {isLoggedIn ?  <LoggedInRoutes/>: <LoggedOutRoutes/>}
     </BrowserRouter>
 

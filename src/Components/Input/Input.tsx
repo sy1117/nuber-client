@@ -31,7 +31,7 @@ interface IProps {
     onChange?:React.ChangeEventHandler |undefined
 }
 
-const Input : React.StatelessComponent<IProps> = ({ placeholder="", type="", required=true , value="", name="", onChange}) => 
+const Input : React.StatelessComponent<IProps> = ({ placeholder, type, required=true , value, name, onChange}) => 
     <Container 
         placeholder={placeholder} 
         type={type}
