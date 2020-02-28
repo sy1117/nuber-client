@@ -3,6 +3,7 @@ import SocialLoginPresenter from "./SocialLoginPresenter";
 import { useMutation, MutationFunction } from "react-apollo";
 import { FACEBOOK_CONNECT } from "./SocialLoginQueries.queries";
 import { toast } from "react-toastify";
+import { LOG_USER_IN } from "../../sharedQueries";
 
 interface IState {
 	firstName:string;
@@ -17,11 +18,20 @@ const SocialLoginContainer  = ()=> {
 		firstName:"", lastName:"", email:"", fbId:""
 	});
 	const { firstName, lastName, email, fbId } = state;
-
+	const [logUserIn] = useMutation(LOG_USER_IN)
 	const [facebookConnect, {loading}] = useMutation<any, any>(FACEBOOK_CONNECT, {
 		variables:{
 			firstName, lastName, email, fbId
 		},
+		update(cache, { data: { FacebookConnect } }) {
+			if(FacebookConnect.ok){
+				logUserIn({
+					variables:{
+						token:FacebookConnect.token
+					}
+				})
+			}
+		}
 	});
 
 	console.log(firstName)
