@@ -6,12 +6,16 @@ import { USER_PROFILE } from '../../sharedQueries.queries';
 import { userProfile } from '../../types/api';
 import { MutationUpdaterFn } from 'apollo-boost';
 import { toast } from 'react-toastify';
+import axios from "axios"
 
 interface IState {
     firstName: string
     lastName: string
     email: string
     profilePhoto: string
+    uploaded:boolean
+    uploading:boolean
+    file?:Blob
 }
 
 
@@ -20,9 +24,11 @@ const EditAccountContainer : React.FunctionComponent= ()=>{
         email: "",
         firstName: "",
         lastName: "",
-        profilePhoto: ""
+        profilePhoto: "",
+        uploaded:false,
+        uploading:false
     })
-    const { email, firstName, lastName, profilePhoto } = state;
+    const { email, firstName, lastName, profilePhoto, uploaded, uploading} = state;
     const [updateProfileMutation, {loading}] = useMutation(UPDATE_PROFILE, {
         onCompleted(data){
             const { UpdateMyProfile } = data;
@@ -39,8 +45,7 @@ const EditAccountContainer : React.FunctionComponent= ()=>{
         if(data.GetMyProfile){
             const { ok, error, user } = GetMyProfile;
             let { email, firstName, lastName, profilePhoto } = user;
-            setState({ email, firstName, lastName, profilePhoto } )
-
+            setState({ ...state, email, firstName, lastName, profilePhoto, uploaded: profilePhoto !== null } )
         }
     }
     const  {data} = useQuery<userProfile>(USER_PROFILE, {
@@ -58,8 +63,26 @@ const EditAccountContainer : React.FunctionComponent= ()=>{
         })
     }
     
-    const inputChangeHandler : React.ChangeEventHandler<HTMLInputElement> = (event)=>{
-        const { target : { name, value} } = event;
+    const inputChangeHandler : React.ChangeEventHandler<HTMLInputElement> = async (event)=>{
+        const { target : { name, value, files} } = event;
+        console.log(files)
+        if(files){
+            setState({
+                ...state,
+                uploaded : false,
+                uploading : true
+            })
+
+            const formData = new FormData();
+            formData.append("file", files[0])
+            formData.append("api_key","512726643244784");
+            formData.append("upload_preset","dc2txi62i");
+            formData.append("timestamp", String(Date.now()/1000))
+
+            const request = await axios.post("https://api.cloudinary.com/v1_1/dc2txi62i/image/upload", formData)
+            console.log(request)
+
+        }
         setState({
             ...state,
             [name] : value
@@ -73,8 +96,10 @@ const EditAccountContainer : React.FunctionComponent= ()=>{
             lastName={lastName}
             profilePhoto={profilePhoto}
             onInputChange={inputChangeHandler}
+            uploading={uploading}
             loading={loading}
             onSubmit={submitHandler}
+            onChange={()=>{}}
         />
     )
 }

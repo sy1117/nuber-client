@@ -5,6 +5,7 @@ import Form from "../../Components/Form";
 import Header from "../../Components/Header";
 import Input from "../../Components/Input";
 import styled from "styled-components";
+import PhotoInput from "../../Components/PhotoInput";
 
 const Container = styled.div``;
 
@@ -21,9 +22,11 @@ interface IProps {
     lastName: string;
     email: string;
     profilePhoto: string;
-    onSubmit: ()=>void
+    onSubmit: () => void
     onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     loading: boolean;
+    uploading:boolean
+    onChange:()=>void
 }
 
 const EditAccountPresenter: React.SFC<IProps> = ({
@@ -33,38 +36,43 @@ const EditAccountPresenter: React.SFC<IProps> = ({
     onSubmit,
     profilePhoto,
     onInputChange,
-    loading
+    loading,
+    uploading,
 }) => (
-    <Container>
-        <Helmet>
-        <title>Edit Account | Number</title>
-        </Helmet>
-        <Header title={"Edit Account"} backTo={"/"} />
-        <ExtendedForm onSubmit={onSubmit}>
-        <ExtendedInput
-            onChange={onInputChange}
-            type={"text"}
-            name={"firstName"}
-            value={firstName}
-            placeholder={"First name"}
-        />
-        <ExtendedInput
-            onChange={onInputChange}
-            type={"text"}
-            name={"lastName"}
-            value={lastName}
-            placeholder={"Last name"}
-        />
-        <ExtendedInput
-            onChange={onInputChange}
-            type={"email"}
-            name={"email"}
-            value={email}
-            placeholder={"Email"}
-        />
-        <Button onClick={onSubmit} value={loading ? "Loading" : "Update"} />
-        </ExtendedForm>
-    </Container>
-);
+        <Container>
+            <Helmet>
+                <title>Edit Account | Number</title>
+            </Helmet>
+            <Header title={"Edit Account"} backTo={"/"} />
+            <ExtendedForm onSubmit={onSubmit}>
+                <PhotoInput 
+                    onChange={onInputChange}
+                    uploading={uploading} 
+                    fileUrl={profilePhoto}/>
+                <ExtendedInput
+                    onChange={onInputChange}
+                    type={"text"}
+                    name={"firstName"}
+                    value={firstName}
+                    placeholder={"First name"}
+                />
+                <ExtendedInput
+                    onChange={onInputChange}
+                    type={"text"}
+                    name={"lastName"}
+                    value={lastName}
+                    placeholder={"Last name"}
+                />
+                <ExtendedInput
+                    onChange={onInputChange}
+                    type={"email"}
+                    name={"email"}
+                    value={email}
+                    placeholder={"Email"}
+                />
+                <Button onClick={onSubmit} value={loading ? "Loading" : "Update"} />
+            </ExtendedForm>
+        </Container>
+    );
 
 export default EditAccountPresenter;
