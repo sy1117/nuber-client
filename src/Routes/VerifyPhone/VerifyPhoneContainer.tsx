@@ -3,7 +3,7 @@ import VerifyPhonePresenter from './VerifyPhonePresenter';
 import { RouteComponentProps, Redirect, withRouter, useHistory, useLocation } from 'react-router-dom';
 import { useMutation } from 'react-apollo';
 import { VERIFY_PHONE } from './VerifyPhoneQueries.queries';
-import { LOG_USER_IN } from '../../sharedQueries';
+import { LOG_USER_IN } from '../../sharedQueries.local';
 import { toast } from 'react-toastify';
 
 interface IProps  {

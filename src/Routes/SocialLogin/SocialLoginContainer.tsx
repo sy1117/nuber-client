@@ -3,7 +3,7 @@ import SocialLoginPresenter from "./SocialLoginPresenter";
 import { useMutation, MutationFunction } from "react-apollo";
 import { FACEBOOK_CONNECT } from "./SocialLoginQueries.queries";
 import { toast } from "react-toastify";
-import { LOG_USER_IN } from "../../sharedQueries";
+import { LOG_USER_IN } from "../../sharedQueries.local";
 
 interface IState {
 	firstName:string;
@@ -19,34 +19,37 @@ const SocialLoginContainer  = ()=> {
 	});
 	const { firstName, lastName, email, fbId } = state;
 	const [logUserIn] = useMutation(LOG_USER_IN)
-	const [facebookConnect, {loading}] = useMutation<any, any>(FACEBOOK_CONNECT, {
-		variables:{
-			firstName, lastName, email, fbId
-		},
-		update(cache, { data: { FacebookConnect } }) {
-			if(FacebookConnect.ok){
-				logUserIn({
-					variables:{
-						token:FacebookConnect.token
-					}
-				})
-			}
-		}
-	});
+	const [facebookMutation, {loading}] = useMutation<any, any>(FACEBOOK_CONNECT);
 
-	console.log(firstName)
 
 	const loginCallback:Function = (fbData:any)=>{
 		let { name, first_name:firstName, last_name:lastName, email, id:fbId, accessToken} = fbData;
 		if(accessToken){
 			toast.success(`Welcome ${name}`);
-			setState({
-				...state,
-				email,
-				firstName,
-				lastName,
-				fbId 
+			facebookMutation({
+				variables :{
+					email,
+					firstName,
+					lastName,
+					fbId,
+				},
+				update(cache, { data: { FacebookConnect } }) {
+					if(FacebookConnect.ok){
+						logUserIn({
+							variables:{
+								token:FacebookConnect.token
+							}
+						})
+					}
+				}
 			})
+			// setState({
+			// 	...state,
+			// 	email,
+			// 	firstName,
+			// 	lastName,
+			// 	fbId 
+			// })
 		}else{
 			toast.error("Could not log in ")
 		}

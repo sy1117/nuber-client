@@ -1,3 +1,3 @@
-export default () => {
-    
-}
+import HomeContainer from "./HomeContainer";
+
+export default HomeContainer
