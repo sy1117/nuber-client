@@ -7,6 +7,9 @@ query userProfile {
         error
         user{
             profilePhoto
+            firstName
+            lastName
+            email
             fullName
             isDriving
         }
