@@ -77,33 +77,37 @@ const ToggleDriving = styled.button<IToggleProps>`
 interface IProps {
   data?:userProfile
   loading:boolean
+  toggleDriving: ()=>void
 }
 
 const MenuPresenter: React.SFC <IProps>= ({
-  data:{GetMyProfile:{user=null}={}}={},loading}) => (
+  	data:{GetMyProfile:{user=null}={}}={},
+	loading,
+	toggleDriving,
+}) => (
     <Container>
-    {!loading && user && user.profilePhoto && 
-      <>
-        <Header>
-          <Grid>
-            <Link to={"/edit-account"}>
-              <Image
-                src={user.profilePhoto}
-              />
-            </Link>
-            <Text>
-              <Name>{user!.fullName}</Name>
-              <Rating>4.5</Rating>
-            </Text>
-          </Grid>
-        </Header>
-        <SLink to="/trips">Your Trips</SLink>
-        <SLink to="/settings">Settings</SLink>
-        <ToggleDriving isDriving={user.isDriving}>
-          {user.isDriving ? "Stop driving" : "Start driving"}
-        </ToggleDriving>
-      </>
-      }
+		{!loading && user && user.profilePhoto && 
+		<>
+			<Header>
+			<Grid>
+				<Link to={"/edit-account"}>
+				<Image
+					src={user.profilePhoto}
+				/>
+				</Link>
+				<Text>
+				<Name>{user!.fullName}</Name>
+				<Rating>4.5</Rating>
+				</Text>
+			</Grid>
+			</Header>
+			<SLink to="/trips">Your Trips</SLink>
+			<SLink to="/settings">Settings</SLink>
+			<ToggleDriving isDriving={user.isDriving} onClick={toggleDriving}>
+				{user.isDriving ? "Stop driving" : "Start driving"}
+			</ToggleDriving>
+		</>
+		}
     </Container>
 );
 
