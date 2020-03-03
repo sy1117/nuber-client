@@ -62,31 +62,37 @@ const EditAccountContainer : React.FunctionComponent= ()=>{
             refetchQueries:[{query:USER_PROFILE}],
         })
     }
+    console.log(uploading, profilePhoto)
     
     const inputChangeHandler : React.ChangeEventHandler<HTMLInputElement> = async (event)=>{
         const { target : { name, value, files} } = event;
-        console.log(files)
         if(files){
             setState({
                 ...state,
-                uploaded : false,
                 uploading : true
             })
 
             const formData = new FormData();
             formData.append("file", files[0])
             formData.append("api_key","512726643244784");
-            formData.append("upload_preset","dc2txi62i");
+            formData.append("upload_preset","smounsa0");
             formData.append("timestamp", String(Date.now()/1000))
 
-            const request = await axios.post("https://api.cloudinary.com/v1_1/dc2txi62i/image/upload", formData)
-            console.log(request)
+            const {data:{secure_url}} = await axios.post("https://api.cloudinary.com/v1_1/dc2txi62i/image/upload", formData)
+            if(secure_url){
+                setState({
+                    ...state,
+                    uploading:false,
+                    profilePhoto:secure_url,
+                })
+            }
 
+        }else{
+            setState({
+                ...state,
+                [name] : value
+            })
         }
-        setState({
-            ...state,
-            [name] : value
-        })
     }
 
     return (
