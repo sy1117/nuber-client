@@ -16,3 +16,16 @@ query userProfile {
     }
 }
 `
+
+export const GET_MY_PLACES = gql`
+    query getPlaces{
+        GetMyPlaces{
+            places {
+                id
+                name
+                address
+                isFav
+            }
+        }
+    }
+`

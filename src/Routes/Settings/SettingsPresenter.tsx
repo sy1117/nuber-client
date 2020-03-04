@@ -3,7 +3,7 @@ import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
 import Header from "../../Components/Header";
 import Place from "../../Components/Place";
-import { userProfile } from "../../types/api";
+import { userProfile, getPlaces } from "../../types/api";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -41,16 +41,20 @@ const SLink = styled(Link)`
   margin: 20px 0px;
 `;
 
-interface IProps {
-  logUserOut: ()=>void;
-  userData?: userProfile;
-  userDataLoading: boolean;
+interface IProps {	
+	logUserOut: ()=>void;
+	userData?: userProfile;
+	userDataLoading: boolean;
+	placesDataLoading: boolean;
+	placesData : getPlaces | undefined;
 }
 
 const SettingsPresenter: React.SFC<IProps> = ({
-  logUserOut,
-  userData: { GetMyProfile: { user = null } = {} } = {},
-  userDataLoading
+	logUserOut,
+	userData: { GetMyProfile: { user = null } = {} } = {},
+	placesData : { GetMyPlaces : { places = null } = {}} = {},
+	userDataLoading,
+	placesDataLoading,
 }) => (
   <React.Fragment>
     <Helmet>
@@ -73,9 +77,12 @@ const SettingsPresenter: React.SFC<IProps> = ({
             </React.Fragment>
           )}
       </GridLink>
-      <Place fav={false} name={"Home"} address={"12345"} />
-      <Place fav={false} name={"Home"} address={"12345"} />
-      <Place fav={false} name={"Home"} address={"12345"} />
+	  {!placesDataLoading &&
+		places &&
+		places.map(place=>
+			<Place key={place!.id} fav={place!.isFav} name={place!.name} address={place!.address} />
+			)
+	  }
       <SLink to={"/places"}>Go to Places</SLink>
       <FakeLink onClick={logUserOut as any}>Log Out</FakeLink>
     </Container>
