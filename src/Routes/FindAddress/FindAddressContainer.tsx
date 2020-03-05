@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import FindAddressPresenter from "./FindAddressPresenter"
 import { RouteComponentProps } from 'react-router-dom'
 import ReactDOM from 'react-dom';
@@ -8,8 +8,9 @@ import ReactDOM from 'react-dom';
 const FindAddressContainer : React.FunctionComponent<any> = ({google})=>{
 
     const [{lat,lng}, setState] = useState({
-        lat
-    })
+        lat:null,
+        lng:null,
+    });
     const mapRef = useRef(null);
     let map : google.maps.Map;
 
