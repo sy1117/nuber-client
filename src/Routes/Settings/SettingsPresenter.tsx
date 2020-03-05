@@ -80,7 +80,7 @@ const SettingsPresenter: React.SFC<IProps> = ({
 	  {!placesDataLoading &&
 		places &&
 		places.map(place=>
-			<Place key={place!.id} fav={place!.isFav} name={place!.name} address={place!.address} />
+			<Place id={place!.id} key={place!.id} fav={place!.isFav} name={place!.name} address={place!.address} />
 			)
 	  }
       <SLink to={"/places"}>Go to Places</SLink>
