@@ -30,6 +30,7 @@ const FindAddressContainer : React.FunctionComponent<any> = ({google})=>{
         const mapNode = ReactDOM.findDOMNode(mapRef.current);
         const mapConfig : google.maps.MapOptions = {
             zoom:11,
+            minZoom:8,
             center:{
                 lat,
                 lng,
@@ -40,13 +41,13 @@ const FindAddressContainer : React.FunctionComponent<any> = ({google})=>{
         map.addListener('dragend', handleDragEnd)
     }
 
-    const handleGeoSuccess = (position: Position)=>{
+    const handleGeoSuccess:PositionCallback = (position: Position)=>{
         const { coords  : {latitude,longitude}} = position;
         setState({...state, lat:latitude, lng:longitude})
         loadMap(latitude,longitude)
     }
 
-    const handleGeoError= ()=>console.error("error")
+    const handleGeoError :PositionErrorCallback= ()=>console.error("error")
 
     const handleDragEnd =  async ()=>{
         const newCenter = map.getCenter();
@@ -66,8 +67,12 @@ const FindAddressContainer : React.FunctionComponent<any> = ({google})=>{
     }
 
     const onInputBlur = async () => {
-        await geoCode(address);
-        console.log("Address updated");
+        const coords:any = await geoCode(address);
+        if(!coords){
+            let { lat, lng, formatted_address:address} = coords;
+            setState({lat,lng, address})
+            map.panTo({lat, lng})
+        }
     };
 
     const geoCodeAddress = async(lat:number,lng:number)=>{

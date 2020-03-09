@@ -6,7 +6,15 @@ export const geoCode = async (address:string)=> {
     const URL =`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${MAPS_KEY}`
 
     const { data } = await axios(URL);
-    console.log(data)
+    if(!data.error_message){
+        const { result } = data;
+        const firstPlace = result[0];
+        const { formatted_address, geometry : { lat, lng }} = firstPlace;
+        return { formatted_address, lat , lng};
+    }else{
+        toast.error(data.error_message)
+        return false
+    }
 };
 
 export const reverseGeoCode = async(lat:number, lng:number)=>{
