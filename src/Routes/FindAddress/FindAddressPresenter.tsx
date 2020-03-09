@@ -1,6 +1,7 @@
 import React from 'react'
 import Helmet from 'react-helmet'
 import styled from 'styled-components'
+import AddressBar from '../../Components/AddressBar'
 
 const Map = styled.div`
     position:absolute;
@@ -24,13 +25,22 @@ const Center = styled.div`
 `
 
 interface IProps{
-    mapRef:any
+    mapRef:any,
+    onInputBlur:()=>void,
+    onInputChange:React.ChangeEventHandler<HTMLInputElement>,
+    address:string
 }
 
-const FindAddressPresenter: React.SFC<IProps> = ({mapRef})=>{
+const FindAddressPresenter: React.SFC<IProps> = ({mapRef,onInputBlur,onInputChange,address})=>{
     return(
         <div>
             <Helmet>Find Address | Nuber</Helmet>
+            <AddressBar
+                onBlur={onInputBlur}
+                onChange={onInputChange}
+                name={"address"}
+                value={address}
+                />
             <Map ref={mapRef}/>
             <Center><span role="img">📍</span></Center>
         </div>
