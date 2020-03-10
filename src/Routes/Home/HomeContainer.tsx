@@ -5,6 +5,9 @@ import { userProfile } from '../../types/api';
 import { USER_PROFILE } from '../../sharedQueries.queries';
 import ReactDOM from 'react-dom';
 import { geoCode } from '../../mapHelpers';
+import { MAPS_KEY } from '../../keys';
+import { toast } from 'react-toastify';
+import { stat } from 'fs';
 
 interface IState { 
     isMenuOpen: boolean,
@@ -13,11 +16,16 @@ interface IState {
     toAddress: string,
     toLat:number,
     toLng:number,
+    distance?: string,
+    duration?: string, 
+    price:number
 }
 
 interface IProps {
 
 }
+
+let map:google.maps.Map, userMarker:google.maps.Marker, toMarker:google.maps.Marker, directions:google.maps.DirectionsRenderer;
 
 const HomeContainer : React.FunctionComponent<any>= ({google})=>{
 
@@ -29,15 +37,17 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
         toAddress:'',
         toLat:0,
         toLng:0,
+        distance:'',
+        duration:'',
+        price:0
     })
-    const {isMenuOpen, lat,lng, toAddress} = state;
+    const {isMenuOpen, lat,lng, toAddress, toLat, toLng, price} = state;
 
     const toggleMenu = ()=>setState({
         ...state,
         isMenuOpen:!isMenuOpen
     });
 
-    let map:google.maps.Map, userMarker:google.maps.Marker, toMarker:google.maps.Marker;
     const mapRef = useRef(null);
 
     useEffect(() => {
@@ -65,16 +75,13 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
          */
         const mapNode = ReactDOM.findDOMNode(mapRef.current);
         const mapConfig : google.maps.MapOptions = {
-            zoom:11,
-            minZoom:8,
-            center:{
-                lat,
-                lng,
-            },
-            disableDefaultUI: false
+            zoom : 11,
+            // minZoom : 8,
+            center : { lat, lng },
+            disableDefaultUI : false
         }
         map  = new google.maps.Map(mapNode, mapConfig)
-
+        console.log(map)
         /**
          * marker
          */
@@ -110,6 +117,7 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
           target: { name, value }
         } = event;
         setState({
+            ...state,
           [name]: value
         } as any);
     };
@@ -118,10 +126,6 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
         const result = await geoCode(toAddress);
         if(result !== false){
             const {lat:toLat, lng:toLng, formatted_address:toAddress} = result;
-            setState({
-                ...state,
-                toLat, toLng, toAddress
-            })
             if(toMarker){
                 toMarker.setMap(null);
             }else{
@@ -137,8 +141,68 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
                 }
                 toMarker = new google.maps.Marker(toMarkerOptions)
                 toMarker.setMap(map);
+                /**
+                 * bound
+                 */
+                const bounds = new google.maps.LatLngBounds();
+                bounds.extend({lat:toLat, lng:toLng});
+                bounds.extend({lat:lat, lng});
+                map.fitBounds(bounds);
+
+                setState({
+                    ...state,
+                    toLat, toLng, toAddress
+                })
+                createPath(toLat, toLng);
             }
         } 
+    }
+
+    const createPath = (toLat:number, toLng:number)=>{
+        if(directions){
+            directions.setMap(null);
+        }
+
+        const renderOptions :google.maps.DirectionsRendererOptions = {
+            polylineOptions : {
+                strokeColor:"#000"
+            },
+            suppressMarkers:true
+        }
+        directions = new google.maps.DirectionsRenderer(renderOptions);
+        const directionService:google.maps.DirectionsService = new google.maps.DirectionsService();
+        const to:google.maps.LatLng = new google.maps.LatLng(toLat.toString(), toLng.toString());
+        const from = new google.maps.LatLng(state.lat.toString(), state.lng.toString());
+        const directionsOptions : google.maps.DirectionsRequest = {
+            destination:to,
+            origin:from,
+            travelMode: google.maps.TravelMode.DRIVING,
+        }
+        directionService.route(directionsOptions, handleRouteRequest);
+
+    }
+
+    const handleRouteRequest = (result:google.maps.DirectionsResult,status:google.maps.DirectionsStatus)=>{
+        if(status === "OK"){
+            const { routes } = result;
+            const { 
+                distance : {text:distance },
+                duration : {text:duration}
+            } = routes[0].legs[0]
+            directions.setDirections(result);
+            directions.setMap(map);
+            setPrice(duration)
+        }else{
+            toast.error("There is no route there, you have to swim.")
+        }
+    }
+
+    const setPrice = (duration:string)=>{
+        let price:number = parseFloat(duration) * 3
+        setState({
+            ...state,
+            price
+        })
     }
 
     return (
@@ -150,6 +214,7 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
             onAddressSubmit={onAddressSubmit}
             mapRef={mapRef}
             toAddress={toAddress}
+            price={price}
         />
     )
 }

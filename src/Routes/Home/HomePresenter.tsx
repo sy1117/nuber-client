@@ -3,11 +3,13 @@ import Sidebar from "react-sidebar";
 import styled from 'styled-components';
 import Menu from '../../Components/Menu'
 import AddressBar from '../../Components/AddressBar';
+import Button from '../../Components/Button';
+import Helmet from 'react-helmet';
 
 const Container = styled.div`
 `
 
-const Button = styled.button`
+const MenuButton = styled.button`
   appearance: none;
   padding: 10px;
   position: absolute;
@@ -22,7 +24,6 @@ const Button = styled.button`
   z-index: 2;
   background-color: transparent;
 `;
-
 
 const Map = styled.div`
   position: absolute;
@@ -42,6 +43,10 @@ const ExtendedButton = styled(Button)`
   width: 80%;
 `;
 
+const RequestButton = styled(ExtendedButton)`
+    bottom:100px;
+`
+
 interface IProps {
     loading: boolean
     isMenuOpen : boolean,
@@ -50,10 +55,15 @@ interface IProps {
     onInputChange: React.ChangeEventHandler,
     onAddressSubmit: React.MouseEventHandler<HTMLButtonElement>
     toAddress: string,
+    price?:number,
 }
 
-const HomePresenter: React.SFC<IProps> = ({loading, isMenuOpen,toggleMenu, mapRef, onInputChange,toAddress,onAddressSubmit})=>
+const HomePresenter: React.SFC<IProps> = 
+    ({loading, isMenuOpen,toggleMenu, mapRef, onInputChange,toAddress,onAddressSubmit, price})=>
 <Container>
+    <Helmet>
+      <title>Home | Number</title>
+    </Helmet>
     <Sidebar
         sidebar={<Menu />}
         open={isMenuOpen}
@@ -65,11 +75,7 @@ const HomePresenter: React.SFC<IProps> = ({loading, isMenuOpen,toggleMenu, mapRe
                 zIndex: "10"
             }}}
         >
-        {!loading &&
-            <Button onClick={() => toggleMenu()}>
-            |||
-            </Button>
-        }
+        {!loading &&<MenuButton onClick={() => toggleMenu()}>|||</MenuButton>}
         <AddressBar
             onBlur={()=>{}}
             onChange={onInputChange}
@@ -77,11 +83,18 @@ const HomePresenter: React.SFC<IProps> = ({loading, isMenuOpen,toggleMenu, mapRe
             value={toAddress}
             />
         <Map ref={mapRef} />
+        {price &&
+        <RequestButton
+            onClick={onAddressSubmit}
+            disabled={toAddress === ""}
+            value={`Request Ride (${price})`}
+        />}
         <ExtendedButton
             onClick={onAddressSubmit}
             disabled={toAddress === ""}
-            value={"Pick Address"}
-        />
+            value={price?"Change Address":"Pick Address"}
+            />
+
     </Sidebar>
 </Container>
 
