@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react'
 import HomePresenter from './HomePresenter';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { userProfile } from '../../types/api';
+import { userProfile, getDrivers } from '../../types/api';
 import { USER_PROFILE } from '../../sharedQueries.queries';
 import ReactDOM from 'react-dom';
 import { geoCode } from '../../mapHelpers';
 import { MAPS_KEY } from '../../keys';
 import { toast } from 'react-toastify';
 import { stat } from 'fs';
-import { REPORT_LOCATION } from './HomeQueries.queries';
+import { REPORT_LOCATION, GET_NEARBY_DRIVERS } from './HomeQueries.queries';
 import { reportMovement } from '../../types/api'
 
 interface IState { 
@@ -31,7 +31,8 @@ let map:google.maps.Map, userMarker:google.maps.Marker, toMarker:google.maps.Mar
 
 const HomeContainer : React.FunctionComponent<any>= ({google})=>{
 
-    const { loading, error } = useQuery<userProfile>(USER_PROFILE);
+    const { loading, error, data:userData} = useQuery<userProfile>(USER_PROFILE);
+    const { data:nearByDriversData} = useQuery<getDrivers>(GET_NEARBY_DRIVERS)
     const [state, setState] = useState<IState>({
         isMenuOpen:false,
         lat:0,
@@ -44,6 +45,9 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
         price:0
     })
     const {isMenuOpen, lat,lng, toAddress, toLat, toLng, price} = state;
+
+
+    console.log(nearByDriversData)
 
     const [reportLocationMutation] = useMutation<reportMovement>(REPORT_LOCATION)
 
@@ -224,6 +228,7 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
             mapRef={mapRef}
             toAddress={toAddress}
             price={price}
+            userData={userData}
         />
     )
 }

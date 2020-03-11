@@ -5,6 +5,7 @@ import { useMutation } from 'react-apollo';
 import { VERIFY_PHONE } from './VerifyPhoneQueries.queries';
 import { LOG_USER_IN } from '../../sharedQueries.local';
 import { toast } from 'react-toastify';
+import { verifyPhone } from '../../types/api';
 
 interface IProps  {
 
@@ -19,7 +20,6 @@ const VerifyPhoneContainer : React.FunctionComponent = ()=>{
         history.push("/")
     }
 
-    const [verifyPhone, {loading, data}] = useMutation(VERIFY_PHONE)
     const [logUserIn] = useMutation<any, any>(LOG_USER_IN);
     const {state} :{state:any}= location; 
     const [formData, setFormData] = useState({
@@ -28,7 +28,28 @@ const VerifyPhoneContainer : React.FunctionComponent = ()=>{
     })
     const {key, phoneNumber} = formData;
 
-    console.log(phoneNumber, location.state)
+    const verifyHandler = (data: any) => {
+        const { CompletePhoneVerification } = data;
+        console.log(data)
+        if (CompletePhoneVerification.ok) {
+            if (CompletePhoneVerification.token) {
+                console.log("here")
+                logUserIn({
+                    variables: {
+                        token: CompletePhoneVerification.token
+                    }
+                });
+
+            }
+            toast.success("You're verified, loggin in now");
+        } else {
+            toast.error(CompletePhoneVerification.error);
+        }
+    }
+
+    const [verifyPhoneMutation, {loading, data}] = useMutation<verifyPhone>(VERIFY_PHONE, {
+        onCompleted : verifyHandler
+    })
     
     const inputChangeHandler : React.ChangeEventHandler<HTMLInputElement>= (event:React.ChangeEvent)=>{
         const {target:{name, value}}:any = event;
@@ -37,32 +58,14 @@ const VerifyPhoneContainer : React.FunctionComponent = ()=>{
             [name] : value,
         })
     }
-
-    const verifyHandler = (data:any) => {
-        const { CompletePhoneVerification } = data;
-        if (CompletePhoneVerification.ok) {
-            if (CompletePhoneVerification.token) {
-                logUserIn({
-                    variables: {
-                        token: CompletePhoneVerification.token
-                    }
-                });
-            }
-            toast.success("You're verified, loggin in now");
-        } else {
-            toast.error(CompletePhoneVerification.error);
-        }
-    }
-
     const submitHandler = ()=>{
         const {key, phoneNumber} = formData;
 
-        verifyPhone({
+        verifyPhoneMutation({
             variables:{
                 key,
                 phoneNumber
             },
-            update: verifyHandler
         })
     }
     

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import EditAccountPresenter from './EditAccountPresenter';
-import { useMutation, useQuery, MutationFunction } from 'react-apollo';
+import { useQuery, MutationFunction, useMutation } from 'react-apollo';
 import { UPDATE_PROFILE } from './EditAccount.queries';
 import { USER_PROFILE } from '../../sharedQueries.queries';
 import { userProfile } from '../../types/api';

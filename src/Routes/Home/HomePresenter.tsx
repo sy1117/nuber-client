@@ -5,6 +5,7 @@ import Menu from '../../Components/Menu'
 import AddressBar from '../../Components/AddressBar';
 import Button from '../../Components/Button';
 import Helmet from 'react-helmet';
+import { userProfile } from '../../types/api';
 
 const Container = styled.div`
 `
@@ -56,10 +57,14 @@ interface IProps {
     onAddressSubmit: React.MouseEventHandler<HTMLButtonElement>
     toAddress: string,
     price?:number,
+    userData:userProfile | undefined
 }
 
 const HomePresenter: React.SFC<IProps> = 
-    ({loading, isMenuOpen,toggleMenu, mapRef, onInputChange,toAddress,onAddressSubmit, price})=>
+    ({
+        loading, isMenuOpen,toggleMenu, mapRef, onInputChange,toAddress,onAddressSubmit, price, 
+        userData : { GetMyProfile : { user = null } = {}}={}
+    })=>
 <Container>
     <Helmet>
       <title>Home | Number</title>
@@ -76,24 +81,29 @@ const HomePresenter: React.SFC<IProps> =
             }}}
         >
         {!loading &&<MenuButton onClick={() => toggleMenu()}>|||</MenuButton>}
-        <AddressBar
-            onBlur={()=>{}}
-            onChange={onInputChange}
-            name={"toAddress"}
-            value={toAddress}
-            />
+        {user && !user.isDriving &&
+            <>
+                <AddressBar
+                    onBlur={()=>{}}
+                    onChange={onInputChange}
+                    name={"toAddress"}
+                    value={toAddress}
+                    />        
+                <ExtendedButton
+                    onClick={onAddressSubmit}
+                    disabled={toAddress === ""}
+                    value={price?"Change Address":"Pick Address"}
+                />
+            </>
+        }
         <Map ref={mapRef} />
         {price &&
-        <RequestButton
-            onClick={onAddressSubmit}
-            disabled={toAddress === ""}
-            value={`Request Ride (${price})`}
-        />}
-        <ExtendedButton
-            onClick={onAddressSubmit}
-            disabled={toAddress === ""}
-            value={price?"Change Address":"Pick Address"}
+            <RequestButton
+                onClick={onAddressSubmit}
+                disabled={toAddress === ""}
+                value={`Request Ride (${price})`}
             />
+        }
 
     </Sidebar>
 </Container>
