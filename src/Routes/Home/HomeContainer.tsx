@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import HomePresenter from './HomePresenter';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { userProfile } from '../../types/api';
 import { USER_PROFILE } from '../../sharedQueries.queries';
 import ReactDOM from 'react-dom';
@@ -8,6 +8,8 @@ import { geoCode } from '../../mapHelpers';
 import { MAPS_KEY } from '../../keys';
 import { toast } from 'react-toastify';
 import { stat } from 'fs';
+import { REPORT_LOCATION } from './HomeQueries.queries';
+import { reportMovement } from '../../types/api'
 
 interface IState { 
     isMenuOpen: boolean,
@@ -42,6 +44,8 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
         price:0
     })
     const {isMenuOpen, lat,lng, toAddress, toLat, toLng, price} = state;
+
+    const [reportLocationMutation] = useMutation<reportMovement>(REPORT_LOCATION)
 
     const toggleMenu = ()=>setState({
         ...state,
@@ -107,6 +111,11 @@ const HomeContainer : React.FunctionComponent<any>= ({google})=>{
     const handleGeoWatchSuccess = (position: Position)=>{
         const { coords : { latitude, longitude}} = position;
         userMarker.setPosition({lat:latitude, lng:longitude})
+        map.panTo({lat:latitude, lng:longitude});
+        reportLocationMutation({
+            variables : {lat: latitude, lng:longitude }
+        })
+
     }
     const handleGeoWatchError = ()=>{
         console.log("watch error")
