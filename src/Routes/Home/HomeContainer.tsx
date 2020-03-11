@@ -32,7 +32,18 @@ let map:google.maps.Map, userMarker:google.maps.Marker, toMarker:google.maps.Mar
 const HomeContainer : React.FunctionComponent<any>= ({google})=>{
 
     const { loading, error, data:userData} = useQuery<userProfile>(USER_PROFILE);
-    const { data:nearByDriversData} = useQuery<getDrivers>(GET_NEARBY_DRIVERS)
+    const { data:nearByDriversData } = useQuery<getDrivers>(GET_NEARBY_DRIVERS,{
+        skip: loading && userData?.GetMyProfile.user?.isDriving,
+        onCompleted(data){
+            const {GetNearByDrivers :{ok, drivers}} = data;
+            if(ok && drivers){
+                console.log(drivers)
+            }
+        }
+    })
+
+    console.log(nearByDriversData?.GetNearByDrivers.drivers)
+
     const [state, setState] = useState<IState>({
         isMenuOpen:false,
         lat:0,
